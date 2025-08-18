@@ -64,7 +64,7 @@ export class OpenAIChatLanguageModel implements LanguageModelV2 {
   private async getArgs({
     prompt,
     maxOutputTokens,
-    temperature,
+    temp,
     topP,
     topK,
     frequencyPenalty,
@@ -143,7 +143,7 @@ export class OpenAIChatLanguageModel implements LanguageModelV2 {
 
       // standardized settings:
       max_tokens: maxOutputTokens,
-      temperature,
+      temperature: temp,
       top_p: topP,
       frequency_penalty: frequencyPenalty,
       presence_penalty: presencePenalty,

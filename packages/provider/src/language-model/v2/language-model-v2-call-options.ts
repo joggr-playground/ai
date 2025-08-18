@@ -24,7 +24,7 @@ Maximum number of tokens to generate.
   /**
 Temperature setting. The range depends on the provider and model.
  */
-  temperature?: number;
+  temp?: number;
 
   /**
 Stop sequences.
@@ -42,7 +42,7 @@ Nucleus sampling.
 Only sample from the top K options for each subsequent token.
 
 Used to remove "long tail" low probability responses.
-Recommended for advanced use cases only. You usually only need to use temperature.
+Recommended for advanced use cases only. You usually only need to use temp.
  */
   topK?: number;
 

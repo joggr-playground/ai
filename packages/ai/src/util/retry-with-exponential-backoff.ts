@@ -59,19 +59,19 @@ You can configure the maximum number of retries, the initial delay, and the back
  */
 export const retryWithExponentialBackoffRespectingRetryHeaders =
   ({
-    maxRetries = 2,
+    maxAttempts = 2,
     initialDelayInMs = 2000,
     backoffFactor = 2,
     abortSignal,
   }: {
-    maxRetries?: number;
+    maxAttempts?: number;
     initialDelayInMs?: number;
     backoffFactor?: number;
     abortSignal?: AbortSignal;
   } = {}): RetryFunction =>
   async <OUTPUT>(f: () => PromiseLike<OUTPUT>) =>
     _retryWithExponentialBackoff(f, {
-      maxRetries,
+      maxAttempts,
       delayInMs: initialDelayInMs,
       backoffFactor,
       abortSignal,
@@ -80,12 +80,12 @@ export const retryWithExponentialBackoffRespectingRetryHeaders =
 async function _retryWithExponentialBackoff<OUTPUT>(
   f: () => PromiseLike<OUTPUT>,
   {
-    maxRetries,
+    maxAttempts,
     delayInMs,
     backoffFactor,
     abortSignal,
   }: {
-    maxRetries: number;
+    maxAttempts: number;
     delayInMs: number;
     backoffFactor: number;
     abortSignal: AbortSignal | undefined;
@@ -99,7 +99,7 @@ async function _retryWithExponentialBackoff<OUTPUT>(
       throw error; // don't retry when the request was aborted
     }
 
-    if (maxRetries === 0) {
+    if (maxAttempts === 0) {
       throw error; // don't wrap the error when retries are disabled
     }
 
@@ -107,10 +107,10 @@ async function _retryWithExponentialBackoff<OUTPUT>(
     const newErrors = [...errors, error];
     const tryNumber = newErrors.length;
 
-    if (tryNumber > maxRetries) {
+    if (tryNumber > maxAttempts) {
       throw new RetryError({
         message: `Failed after ${tryNumber} attempts. Last error: ${errorMessage}`,
-        reason: 'maxRetriesExceeded',
+        reason: 'maxAttemptsExceeded',
         errors: newErrors,
       });
     }
@@ -119,7 +119,7 @@ async function _retryWithExponentialBackoff<OUTPUT>(
       error instanceof Error &&
       APICallError.isInstance(error) &&
       error.isRetryable === true &&
-      tryNumber <= maxRetries
+      tryNumber <= maxAttempts
     ) {
       await delay(
         getRetryDelayInMs({
@@ -132,7 +132,7 @@ async function _retryWithExponentialBackoff<OUTPUT>(
       return _retryWithExponentialBackoff(
         f,
         {
-          maxRetries,
+          maxAttempts,
           delayInMs: backoffFactor * delayInMs,
           backoffFactor,
           abortSignal,

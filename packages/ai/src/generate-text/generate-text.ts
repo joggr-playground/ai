@@ -103,7 +103,7 @@ If set, the model will stop generating text when one of the stop sequences is ge
 @param seed - The seed (integer) to use for random sampling.
 If set and supported by the model, calls will generate deterministic results.
 
-@param maxRetries - Maximum number of retries. Set to 0 to disable retries. Default: 2.
+@param maxAttempts - Maximum number of attempts. Set to 0 to disable retries. Default: 2.
 @param abortSignal - An optional abort signal that can be used to cancel the call.
 @param headers - Additional HTTP headers to be sent with the request. Only applicable for HTTP-based providers.
 
@@ -125,7 +125,7 @@ export async function generateText<
   system,
   prompt,
   messages,
-  maxRetries: maxRetriesArg,
+  maxAttempts: maxAttemptsArg,
   abortSignal,
   headers,
   stopWhen = stepCountIs(1),
@@ -238,8 +238,8 @@ A function that attempts to repair a tool call that failed to parse.
   }): Promise<GenerateTextResult<TOOLS, OUTPUT>> {
   const model = resolveLanguageModel(modelArg);
   const stopConditions = asArray(stopWhen);
-  const { maxRetries, retry } = prepareRetries({
-    maxRetries: maxRetriesArg,
+  const { maxAttempts, retry } = prepareRetries({
+    maxAttempts: maxAttemptsArg,
     abortSignal,
   });
 
@@ -249,7 +249,7 @@ A function that attempts to repair a tool call that failed to parse.
     model,
     telemetry,
     headers,
-    settings: { ...callSettings, maxRetries },
+    settings: { ...callSettings, maxAttempts },
   });
 
   const initialPrompt = await standardizePrompt({

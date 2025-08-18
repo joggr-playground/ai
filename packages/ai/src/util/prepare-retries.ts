@@ -8,39 +8,39 @@ import {
  * Validate and prepare retries.
  */
 export function prepareRetries({
-  maxRetries,
+  maxAttempts,
   abortSignal,
 }: {
-  maxRetries: number | undefined;
+  maxAttempts: number | undefined;
   abortSignal: AbortSignal | undefined;
 }): {
-  maxRetries: number;
+  maxAttempts: number;
   retry: RetryFunction;
 } {
-  if (maxRetries != null) {
-    if (!Number.isInteger(maxRetries)) {
+  if (maxAttempts != null) {
+    if (!Number.isInteger(maxAttempts)) {
       throw new InvalidArgumentError({
-        parameter: 'maxRetries',
-        value: maxRetries,
-        message: 'maxRetries must be an integer',
+        parameter: 'maxAttempts',
+        value: maxAttempts,
+        message: 'maxAttempts must be an integer',
       });
     }
 
-    if (maxRetries < 0) {
+    if (maxAttempts < 0) {
       throw new InvalidArgumentError({
-        parameter: 'maxRetries',
-        value: maxRetries,
-        message: 'maxRetries must be >= 0',
+        parameter: 'maxAttempts',
+        value: maxAttempts,
+        message: 'maxAttempts must be >= 0',
       });
     }
   }
 
-  const maxRetriesResult = maxRetries ?? 2;
+  const maxAttemptsResult = maxAttempts ?? 2;
 
   return {
-    maxRetries: maxRetriesResult,
+    maxAttempts: maxAttemptsResult,
     retry: retryWithExponentialBackoffRespectingRetryHeaders({
-      maxRetries: maxRetriesResult,
+      maxAttempts: maxAttemptsResult,
       abortSignal,
     }),
   };
